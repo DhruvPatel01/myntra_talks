@@ -61,7 +61,7 @@
   \item Acceptance probability for proposal of $z^*$ from $z^\tau$
 
     \[
-      A(z^*, z^\tau) = \text{min} \left( 1, \frac{\tilde{p}(z^*) q(z^\tau|z^*)}{\tilde{p}(z^\tau) q(z^*|z^\tau)} \right)
+      A(z^*|z^\tau) = \text{min} \left( 1, \frac{\tilde{p}(z^*) q(z^\tau|z^*)}{\tilde{p}(z^\tau) q(z^*|z^\tau)} \right)
     \]
 
     Where $\tilde{p}(z)$ is the unnormalized density at $z$ and $q(z|z')$ is a proposal distribution at $z'$.
@@ -69,7 +69,7 @@
   \item Transition probability is given by
 
     \[
-      T(z^\tau, z^*) = q(z^*|z^\tau) A(z^*, z^\tau)
+      T(z^\tau, z^*) = q(z^*|z^\tau) A(z^*| z^\tau)
     \]
     
   \end{itemize}
@@ -79,16 +79,17 @@
   We will prove that our target distribution $p$ (i.e. normalized version of $\tilde{p}$) is stationary distribution with respect to transition probability defined in last slide by proving that it satisfies detailed balance condition. (detailed balance $\implies$ stationary distribution)
 
 \end{frame}
-\begin{frame}
+\begin{frame}[shrink]
   \begin{proof}
     \begin{align*}
-      p(z)T(z, z') &= p(z) q(z'|z) A(z', z) \\
+      p(z)T(z, z') &= p(z) q(z'|z) A(z'|z) \\
                    &= p(z) q(z'|z)  \text{min} \left( 1, \frac{\tilde{p}(z') q(z|z')}{\tilde{p}(z) q(z'|z)} \right) \\
                    &= \text{min} \left( p(z) q(z'|z) , p(z) q(z'|z) \frac{\tilde{p}(z') q(z|z')}{\tilde{p}(z) q(z'|z)} \right) \\
-                   &= \text{min} ( p(z) q(z'|z) , p(z') q(z|z')) \\
-                   &= \text{min} ( p(z') q(z|z') , p(z) q(z'|z)) \\
+                   &= \text{min} \ ( p(z) q(z'|z) , p(z') q(z|z')) \\
+                   &= \text{min} \ ( p(z') q(z|z') , p(z) q(z'|z)) \\
                    &=  p(z') q(z|z') \text{min} \left(1 , \frac{p(z) q(z'|z)}{p(z') q(z|z')}\right) \\
                    &=  p(z') q(z|z') \text{min} \left(1 , \frac{\tilde{p}(z) q(z'|z)}{\tilde{p}(z') q(z|z')}\right)\\
+                   &= p(z') q(z|z') A(z|z') \\
                    &= p(z') T(z', z)
     \end{align*}
   \end{proof}
@@ -96,7 +97,15 @@
 
 \subsection{Gibbs Sampling}
 \begin{frame}{Gibbs Sampling}
-  Metropolis-Hastings algorithm can be inefficient if proposal distribution is not chosen properly, as seen in demo. However if our target distribution is over $m$ variables and we can compute conditional distribution $p(z_m|z_{-m})$ where $z_{-m}$ denotes all variables other than $z_m$, Gibbs sampling is efficient algorithm.
+  \begin{itemize}
+  \item   Metropolis-Hastings algorithm can be inefficient if proposal distribution is not chosen properly, as seen in demo.
+
+    \pause
+  \item   However if our target distribution is over $m$ variables and we can compute conditional distribution $p(z_m|z_{-m})$ where $z_{-m}$ denotes all variables other than $z_m$, Gibbs sampling is efficient algorithm.
+  \end{itemize}
+
+
+
   \pause
 
   \begin{block}{Algorithm}
@@ -122,10 +131,9 @@
     \begin{align*}
       &  \sum_{z'}p(z') T(z', z) \\
       =& \sum_{z_i'}  \sum_{z_{-i}'} T(z', z) p(z_i'|z_{-i}') p(z_{-i}')  \\
-      =& \sum_{z_i'}  T(z', z) p(z_i'|z_{-i}') p(z_{-i}') \\
-      =&  p(z_{-i}') \sum_{z_i'}  p(z_i|z_{-i}') p(z_i'|z_{-i}') \\
-      =&  p(z_{-i}')  p(z_i|z_{-i}') \sum_{z_i'}  p(z_i'|z_{-i}') \\
-      =&  p(z_{-i})  p(z_i|z_{-i})  && \text{because} \quad z_{-i}' = z_{-i} \\
+      =& \sum_{z_i'}  T(z', z) p(z_i'|z_{-i}') p(z_{-i}') &&\text{where} \  z_{-i}' = z_{-i} \\
+      =&  p(z_{-i}) \sum_{z_i'}  p(z_i|z_{-i}) p(z_i'|z_{-i}) \\
+      =&  p(z_{-i})  p(z_i|z_{-i}) \sum_{z_i'}  p(z_i'|z_{-i}) \\
       =& p(z)
     \end{align*}
   \end{proof}
